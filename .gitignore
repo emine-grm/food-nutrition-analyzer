@@ -4,3 +4,8 @@ __pycache__/
 config.py
 nutrition_report.txt
 test_food.jpg
+data/
+static/assets/
+*.jpg
+*.png
+*.jpeg
