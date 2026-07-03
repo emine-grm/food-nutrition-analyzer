@@ -1,0 +1,36 @@
+# Google Cloud Run deployment configuration
+# Deploy with: gcloud run deploy meal-coach --source .
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: meal-coach
+  annotations:
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        # Scale to zero when no traffic (cost efficient)
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "3"
+        # Use GPU instance for BLIP-2
+        run.googleapis.com/execution-environment: gen2
+    spec:
+      # Timeout for BLIP-2 inference (it takes a few seconds)
+      timeoutSeconds: 120
+      containers:
+        - image: gcr.io/YOUR_PROJECT_ID/meal-coach
+          ports:
+            - containerPort: 8000
+          env:
+            # Secret stored in Google Secret Manager, not hardcoded
+            - name: USDA_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: usda-api-key
+                  key: latest
+          resources:
+            limits:
+              memory: 8Gi
+              cpu: "4"

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emina — Sign up</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+</head>
+<body data-page="signup">
+
+<div class="auth-wrap">
+  <div class="auth-visual">
+    <div class="hero-bg-shape" style="top:-160px; right:-120px;"></div>
+    <img src="{{ url_for('static', filename='assets/burger.jpg') }}" alt="" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.5; mix-blend-mode:luminosity;">
+    <div style="position:relative; z-index:2; max-width:380px;" class="fade-in">
+      <span class="eyebrow" data-i18n="landing_feat2_t">Speaks your language</span>
+      <h2 class="h-display h2" style="margin-top:10px;" data-i18n="landing_feat2_d">Full reports in English, French, and Arabic — so nothing gets lost on a menu abroad.</h2>
+    </div>
+  </div>
+
+  <div class="auth-form-col">
+    <form class="auth-form fade-in" id="signupForm">
+      <div class="brand" style="margin-bottom:var(--sp-6);">
+        <span class="mark"></span><span data-i18n="brand">Emina</span>
+      </div>
+      <h1 class="h-display h2" data-i18n="signup_title">Create your account</h1>
+      <p class="text-mid" style="margin-top:8px; margin-bottom:var(--sp-6);" data-i18n="signup_sub">Takes less than a minute.</p>
+
+      <div class="field" style="margin-bottom:var(--sp-4);">
+        <label data-i18n="signup_name">Full name</label>
+        <input type="text" required placeholder="Amina Guerrane">
+      </div>
+      <div class="field" style="margin-bottom:var(--sp-4);">
+        <label data-i18n="signup_email">Email</label>
+        <input type="email" required placeholder="you@example.com">
+      </div>
+      <div class="field" style="margin-bottom:var(--sp-5);">
+        <label data-i18n="signup_pass">Password</label>
+        <input type="password" required placeholder="••••••••">
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" data-i18n="signup_btn">Create account</button>
+
+      <p class="text-mid" style="text-align:center; margin-top:var(--sp-5); font-size:0.88rem;">
+        <span data-i18n="signup_switch">Already have an account?</span>
+        <a href="login.html" style="color:var(--violet); font-weight:600;" data-i18n="signup_switch_link">Log in</a>
+      </p>
+
+      <div class="hr" style="margin-block:var(--sp-6);"></div>
+      <div class="lang-switch" style="margin-inline:auto; width:fit-content;">
+        <button type="button" data-lang="en">EN</button>
+        <button type="button" data-lang="fr">FR</button>
+        <button type="button" data-lang="ar">AR</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
+<script src="{{ url_for('static', filename='js/state.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script>
+document.getElementById('signupForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  window.location.href = 'onboarding.html';
+});
+</script>
+</body>
+</html>

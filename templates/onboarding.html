@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emina — Set up your profile</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+</head>
+<body data-page="onboarding">
+
+<div class="container onboard-shell">
+  <div class="brand" style="margin-bottom:var(--sp-6);"><span class="mark"></span><span data-i18n="brand">Emina</span></div>
+
+  <div class="progress-dots" id="dots">
+    <span><i style="width:100%"></i></span>
+    <span><i></i></span>
+    <span><i></i></span>
+    <span><i></i></span>
+  </div>
+
+  <p class="eyebrow" data-i18n="onboard_eyebrow">SET UP YOUR PROFILE</p>
+  <p class="text-mid" style="margin-top:6px; margin-bottom:var(--sp-6); font-size:0.86rem;">
+    <span data-i18n="onboard_step">Step</span> <span id="stepNum" class="mono">1</span> <span data-i18n="onboard_of">of</span> 4
+  </p>
+
+  <!-- Step 1 -->
+  <div class="card step fade-in" data-step="1">
+    <h2 class="h-display h3" data-i18n="onboard1_t">Tell us about you</h2>
+    <div class="field-row" style="margin-top:var(--sp-5);">
+      <div class="field">
+        <label data-i18n="onboard1_age">Age</label>
+        <input type="number" id="f-age" value="24" min="10" max="100">
+      </div>
+      <div class="field">
+        <label data-i18n="onboard1_gender">Gender</label>
+        <select id="f-gender">
+          <option value="female" data-i18n="gender_female">Female</option>
+          <option value="male" data-i18n="gender_male">Male</option>
+          <option value="other" data-i18n="gender_other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row" style="margin-top:var(--sp-4);">
+      <div class="field">
+        <label data-i18n="onboard1_weight">Weight (kg)</label>
+        <input type="number" id="f-weight" value="58">
+      </div>
+      <div class="field">
+        <label data-i18n="onboard1_height">Height (cm)</label>
+        <input type="number" id="f-height" value="165">
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="card step" data-step="2" hidden>
+    <h2 class="h-display h3" data-i18n="onboard2_t">What's your goal?</h2>
+    <div class="chip-group" id="goalChips" style="margin-top:var(--sp-5);">
+      <button type="button" class="chip selected" data-value="lose_weight" data-i18n="goal_lose">Lose weight</button>
+      <button type="button" class="chip" data-value="maintain" data-i18n="goal_maintain">Maintain weight</button>
+      <button type="button" class="chip" data-value="gain_muscle" data-i18n="goal_gain">Gain muscle</button>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="card step" data-step="3" hidden>
+    <h2 class="h-display h3" data-i18n="onboard3_t">Any dietary restrictions?</h2>
+    <div class="chip-group" id="dietChips" style="margin-top:var(--sp-5);">
+      <button type="button" class="chip selected" data-value="halal" data-i18n="diet_halal">Halal</button>
+      <button type="button" class="chip" data-value="vegetarian" data-i18n="diet_vegetarian">Vegetarian</button>
+      <button type="button" class="chip" data-value="vegan" data-i18n="diet_vegan">Vegan</button>
+      <button type="button" class="chip" data-value="gluten_free" data-i18n="diet_glutenfree">Gluten-free</button>
+      <button type="button" class="chip" data-value="none" data-i18n="diet_none">None</button>
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="card step" data-step="4" hidden>
+    <h2 class="h-display h3" data-i18n="onboard4_t">Choose your language</h2>
+    <div class="chip-group" id="langChips" style="margin-top:var(--sp-5);">
+      <button type="button" class="chip selected" data-value="en">English</button>
+      <button type="button" class="chip" data-value="fr">Français</button>
+      <button type="button" class="chip" data-value="ar">العربية</button>
+    </div>
+  </div>
+
+  <div style="display:flex; justify-content:space-between; margin-top:var(--sp-6);">
+    <button type="button" class="btn btn-ghost" id="backBtn" data-i18n="onboard_back" hidden>Back</button>
+    <div style="flex:1"></div>
+    <button type="button" class="btn btn-primary" id="nextBtn" data-i18n="onboard_next">Next</button>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
+<script src="{{ url_for('static', filename='js/state.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script>
+let step = 1;
+const total = 4;
+const dots = document.querySelectorAll('#dots i');
+const backBtn = document.getElementById('backBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+function selectableGroup(id){
+  document.getElementById(id).addEventListener('click', function(e){
+    const btn = e.target.closest('.chip');
+    if(!btn) return;
+    this.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+    btn.classList.add('selected');
+  });
+}
+selectableGroup('goalChips');
+selectableGroup('dietChips');
+selectableGroup('langChips');
+
+function render(){
+  document.querySelectorAll('.step').forEach(s => s.hidden = (Number(s.dataset.step) !== step));
+  dots.forEach((d,i) => d.style.width = (i < step ? '100%' : '0%'));
+  document.getElementById('stepNum').textContent = step;
+  backBtn.hidden = step === 1;
+  nextBtn.textContent = step === total ? NouraI18n.t('onboard_finish') : NouraI18n.t('onboard_next');
+}
+
+backBtn.addEventListener('click', function(){ step = Math.max(1, step-1); render(); });
+nextBtn.addEventListener('click', function(){
+  if(step < total){ step++; render(); return; }
+  // finish
+  const lang = document.querySelector('#langChips .selected').dataset.value;
+  NouraI18n.setLang(lang);
+  NouraState.update(function(s){
+    s.onboarded = true;
+    s.profile.age = Number(document.getElementById('f-age').value);
+    s.profile.gender = document.getElementById('f-gender').value;
+    s.profile.weight_kg = Number(document.getElementById('f-weight').value);
+    s.profile.height_cm = Number(document.getElementById('f-height').value);
+    s.profile.goal = document.querySelector('#goalChips .selected').dataset.value;
+    const diet = document.querySelector('#dietChips .selected').dataset.value;
+    s.profile.restrictions = diet === 'none' ? [] : [diet];
+    s.profile.language = lang;
+  });
+  window.location.href = 'dashboard.html';
+});
+
+render();
+</script>
+</body>
+</html>

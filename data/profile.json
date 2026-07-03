@@ -1,0 +1,21 @@
+{
+  "name": "Amina",
+  "age": 24,
+  "weight_kg": 58,
+  "height_cm": 165,
+  "gender": "female",
+  "goal": "lose_weight",
+  "restrictions": [
+    "halal"
+  ],
+  "language": "english",
+  "daily_targets": {
+    "calories": 1329,
+    "protein_g": 116,
+    "carbs_g": 116,
+    "fat_g": 44,
+    "fiber_g": 30,
+    "sugar_g": 50,
+    "sodium_mg": 2300
+  }
+}

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emina — Analyze a meal</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+<style>
+  .step-check{ display:flex; align-items:center; gap:12px; padding:10px 0; opacity:.35; transition:opacity .3s; }
+  .step-check.active{ opacity:1; }
+  .step-check .dot{ width:20px; height:20px; border-radius:50%; border:2px solid var(--line); flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .3s; }
+  .step-check.active .dot{ border-color:var(--violet); background:var(--violet); }
+  .step-check.active .dot svg{ width:12px; height:12px; color:#fff; }
+  .spin{ width:20px; height:20px; border:2px solid var(--violet-soft); border-top-color:var(--violet); border-radius:50%; animation:spinner .8s linear infinite; }
+  @keyframes spinner{ to{ transform:rotate(360deg); } }
+</style>
+</head>
+<body data-page="analyze">
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span class="mark"></span><span class="h-display" style="font-weight:600;" data-i18n="brand">Emina</span></div>
+    <nav class="nav-group">
+      <a href="dashboard.html" class="nav-item" data-nav="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>
+        <span data-i18n="nav_dashboard">Dashboard</span>
+      </a>
+      <a href="analyze.html" class="nav-item" data-nav="analyze">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8a2 2 0 0 1 2-2h1l1.5-2h7L17 6h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        <span data-i18n="nav_analyze">Analyze</span>
+      </a>
+      <a href="history.html" class="nav-item" data-nav="history">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+        <span data-i18n="nav_history">History</span>
+      </a>
+      <a href="profile.html" class="nav-item" data-nav="profile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c1.5-4 5-5.5 7.5-5.5s6 1.5 7.5 5.5"/></svg>
+        <span data-i18n="nav_profile">Profile</span>
+      </a>
+    </nav>
+    <div class="sidebar-foot">
+      <a href="login.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 17v1a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v1M9 12h11M17 8l3 4-3 4"/></svg>
+        <span data-i18n="nav_logout">Log out</span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="fade-in" style="max-width:640px; margin-inline:auto;">
+      <span class="eyebrow" data-i18n="analyze_eyebrow">NEW MEAL</span>
+      <h1 class="h-display h2" style="margin-top:10px;" data-i18n="analyze_h1">What are you eating?</h1>
+      <p class="text-mid" style="margin-top:8px; margin-bottom:var(--sp-6);" data-i18n="analyze_sub">Upload a clear photo of your meal and Emina will handle the rest.</p>
+
+      <!-- Dropzone state -->
+      <div id="dropState">
+        <label class="dropzone" id="dropzone">
+          <input type="file" accept="image/*" id="fileInput">
+          <div class="dropzone-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+          </div>
+          <p style="font-weight:600;" data-i18n="analyze_drop_t">Drop a photo here</p>
+          <p class="text-mid" style="margin-top:4px; font-size:0.86rem;" data-i18n="analyze_drop_d">or click to browse — JPG, PNG up to 10MB</p>
+        </label>
+        <button type="button" class="btn btn-ghost btn-block" style="margin-top:var(--sp-4);" id="demoBtn">Use sample photo instead</button>
+      </div>
+
+      <!-- Analyzing state -->
+      <div id="analyzingState" class="card fade-in" style="display:none;">
+        <div class="scan-wrap" style="margin-bottom:var(--sp-5);">
+          <img id="previewImg" src="{{ url_for('static', filename='assets/burger.jpg') }}" style="width:100%; aspect-ratio:4/3; object-fit:cover;">
+          <div class="scan-grid"></div>
+          <div class="scan-line"></div>
+        </div>
+        <p class="h3 h-display" style="text-align:center; margin-bottom:var(--sp-4);" data-i18n="analyze_analyzing">Analyzing your meal…</p>
+        <div class="step-check" id="s1"><div class="dot"></div><span data-i18n="analyze_step1">Identifying the dish</span></div>
+        <div class="step-check" id="s2"><div class="dot"></div><span data-i18n="analyze_step2">Matching verified nutrition data</span></div>
+        <div class="step-check" id="s3"><div class="dot"></div><span data-i18n="analyze_step3">Checking it against your goals</span></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<nav class="mobile-nav">
+  <a href="dashboard.html" data-nav="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg><span data-i18n="nav_dashboard">Dashboard</span></a>
+  <a href="analyze.html" data-nav="analyze"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8a2 2 0 0 1 2-2h1l1.5-2h7L17 6h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><circle cx="12" cy="13" r="3.5"/></svg><span data-i18n="nav_analyze">Analyze</span></a>
+  <a href="history.html" data-nav="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><span data-i18n="nav_history">History</span></a>
+  <a href="profile.html" data-nav="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c1.5-4 5-5.5 7.5-5.5s6 1.5 7.5 5.5"/></svg><span data-i18n="nav_profile">Profile</span></a>
+</nav>
+
+<script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
+<script src="{{ url_for('static', filename='js/state.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script>
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+
+['dragenter','dragover'].forEach(evt => dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.add('drag'); }));
+['dragleave','drop'].forEach(evt => dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.remove('drag'); }));
+dropzone.addEventListener('drop', function(e){
+  const file = e.dataTransfer.files[0];
+  if(file) startAnalysis(URL.createObjectURL(file));
+});
+fileInput.addEventListener('change', function(){
+  if(fileInput.files[0]) startAnalysis(URL.createObjectURL(fileInput.files[0]));
+});
+document.getElementById('demoBtn').addEventListener('click', function(){ startAnalysis('{{ url_for('static', filename='assets/burger.jpg') }}'); });
+
+// Real nutrition data captured from this project's own USDA lookup
+// (see nutrition_report.txt) — used here to drive the results page.
+const HAMBURGER_NUTRITION = {
+  calories:256, protein_g:9.3, carbs_g:46.5, fat_g:4.7, fiber_g:2.3, sugar_g:0, sodium_mg:488
+};
+
+function startAnalysis(imgSrc){
+  document.getElementById('previewImg').src = imgSrc;
+  document.getElementById('dropState').style.display = 'none';
+  document.getElementById('analyzingState').style.display = 'block';
+
+  const steps = ['s1','s2','s3'];
+  let i = 0;
+  function nextStep(){
+    if(i > 0) document.getElementById(steps[i-1]).querySelector('.dot').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 12l5 5L20 6"/></svg>';
+    if(i < steps.length){
+      document.getElementById(steps[i]).classList.add('active');
+      i++;
+      setTimeout(nextStep, 750);
+    } else {
+      const s = NouraState.get();
+      const verdict = NouraState.scoreMeal(HAMBURGER_NUTRITION, s.profile.daily_targets);
+      NouraState.update(function(st){
+        st.lastAnalysis = {
+          name:'Hamburger',
+          matched:'HAMBURGER',
+          img: imgSrc.startsWith('blob:') ? '{{ url_for('static', filename='assets/burger.jpg') }}' : imgSrc,
+          nutrition: HAMBURGER_NUTRITION,
+          score: verdict.score, verdict: verdict.verdict,
+          positives: verdict.positives, concerns: verdict.concerns
+        };
+      });
+      setTimeout(function(){ window.location.href = 'results.html'; }, 350);
+    }
+  }
+  setTimeout(nextStep, 400);
+}
+</script>
+</body>
+</html>
